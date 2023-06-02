@@ -1,95 +1,54 @@
 import './App.css';
-import FoodRatingsService from './services/FoodRatingsService';
 import {useEffect, useState} from "react";
+import FoodRatingsApi from "./api/FoodRatingsApi";
+import GoogleMapComponent from "./googleMap";
 
 function App() {
 
     const [data, setData] = useState(null);
+    const [apiKey, setApiKey] = useState(null);
 
     useEffect(() => {
-        fetchData();
+        fetchBelfastData();
     }, []);
 
-    const fetchData = async () => {
-        try {
-            const response = await FoodRatingsService;
-            setData(response.establishments)
-        } catch (error) {
-            console.error('Error fetching data:', error);
+    const fetchBelfastData = async () => {
+        const response = await FoodRatingsApi.fetchBelfastEstablishments();
+        setData(response.establishments);
+        console.log('data retrieved')
+        console.log(response)
+    }
+
+    // fetch API key from JSON file
+    fetch('./secret/keys.json')
+        .then(response => response.json())
+        .then(data => {
+            setApiKey(data.google_maps_key);
+            console.log('Saved api key');
+        })
+        .catch(error => {
+            console.error('Error fetching JSON:', error);
+        });
+
+    // pins
+    const pins = [
+        { lat: 40.712776, lng: -74.005974 }, // Example pin 1
+        { lat: 34.052235, lng: -118.243683 }, // Example pin 2
+        // Add more pins here
+    ];
+
+    sortPins = () => {
+        if(data != null){
+
         }
-    };
-
-    //0
-  // "Caring Premises" 1
-  // "Restaurant/Cafe/Canteen"
-  // 2
-  // "Manufacturers/packers"
-  // 3
-  // "Takeaway/sandwich shop"
-  // 4
-  // "School/college/university"
-  // 5
-  // "Retailers - other"
-  // 6
-  // "Other catering premises"
-  // 7
-  // "Pub/bar/nightclub"
-  // 8
-  // "Hotel/bed & breakfast/guest house"
-  // 9
-  // "Mobile caterer"
-  // 10
-  // "Distributors/Transporters"
-  // 11
-  // "Retailers - supermarkets/hypermarkets"
-  // 12
-  // "Importers/Exporters"
-
-    // Use the data state outside the effect
-    const uniqueBusinessTypes = new Set();
-
-    // Run the filtering logic when data changes
-    useEffect(() => {
-
-        // Check if data has been fetched
-        if (data == null) {
-            return;
-        } else {
-            data.forEach((establishment) => {
-                uniqueBusinessTypes.add(establishment.BusinessType);
-            });
-        console.log(uniqueBusinessTypes)
-        return uniqueBusinessTypes;
-        }
-    }, [data]);
+    }
 
 
 
     return (
         <div>
-            <h1>My App</h1>
-            {data ? (
-                    <ul>
-                        {data.map((item) => (
-                            <li key={item['FHRSID']}>
-                                <div>
-                                    <p>{item['BusinessName']}</p>
-                                    <p>{item['Address']}</p>
-                                    <p>{item['City']}</p>
-                                    {/* Add more item fields here */}
-                                </div>
-                            </li>
-
-                        ))}
-
-
-                    </ul>
-                )
-                :
-                (
-                    <p>Loading...</p>
-                )
-            }
+            <h1>Map</h1>
+            <GoogleMapComponent lng={0} lat={0} apiKey={apiKey}></GoogleMapComponent>
         </div>
     )
         ;
