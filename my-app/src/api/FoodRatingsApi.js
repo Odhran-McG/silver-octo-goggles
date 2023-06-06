@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 class FoodRatingsApi {
     constructor() {
         this.instance = axios.create({
@@ -28,4 +29,4 @@ class FoodRatingsApi {
     }
 }
 
-export default new FoodRatingsApi();
+export default FoodRatingsApi;
